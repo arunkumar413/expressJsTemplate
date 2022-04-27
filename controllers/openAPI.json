@@ -1,0 +1,83 @@
+{
+  "openapi": "3.0.2",
+  "info": {
+    "title": "Sample Pet Store App",
+    "summary": "A pet store manager.",
+    "description": "This is a sample server for a pet store.",
+    "termsOfService": "https://example.com/terms/",
+    "contact": {
+      "name": "API Support",
+      "url": "https://www.example.com/support",
+      "email": "support@example.com"
+    },
+    "license": {
+      "name": "Apache 2.0",
+      "url": "https://www.apache.org/licenses/LICENSE-2.0.html"
+    },
+    "version": "1.0.1"
+  },
+
+  "servers": [
+    {
+      "url": "https://api.server.test/v1",
+      "description": "development"
+    },
+    {
+      "url": "https://api.server.test/v1",
+      "description": "test"
+    },
+    {
+      "url": "https://api.server.test/v1",
+      "description": "production"
+    }
+  ],
+  "paths": {
+    "/test": {
+      "get": {
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/create-admin": {
+      "post": {
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/createAdmin"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "createAdmin": {
+        "type": "object",
+        "properties": {
+          "userId": {
+            "type": "string"
+          },
+
+          "groupId": {
+            "type": "string"
+          },
+          "userEmail": {
+            "type": "string"
+          }
+        }
+      }
+    }
+  }
+}
