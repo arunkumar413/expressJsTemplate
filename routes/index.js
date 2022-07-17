@@ -13,6 +13,7 @@ const {
   NewUser,
   NewGroup,
 } = require("../controllers/chatController");
+const { getFileSystem, getDirectoryTree } = require("../controllers/fileSystemController");
 var router = express.Router();
 
 /* GET home page. */
@@ -34,9 +35,10 @@ router.post("/neo4jtest", NeoTest);
 router.post("/new-user", NewUser);
 
 router.post("/create-group", NewGroup);
-router.post("/add-user-to-group",  addUserToGroup);
+router.post("/add-user-to-group", addUserToGroup);
 router.post("/new-message", NewMessage);
 
-//--------------------------------------------
+//--------------------file system routes------------------------
+router.get("/getdirtree", getDirectoryTree);
 
 module.exports = router;
