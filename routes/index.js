@@ -13,7 +13,11 @@ const {
   NewUser,
   NewGroup,
 } = require("../controllers/chatController");
-const { getFileSystem, getDirectoryTree } = require("../controllers/fileSystemController");
+const {
+  getFileSystem,
+  getDirectoryTree,
+  RenameFile,
+} = require("../controllers/fileSystemController");
 var router = express.Router();
 
 /* GET home page. */
@@ -40,5 +44,6 @@ router.post("/new-message", NewMessage);
 
 //--------------------file system routes------------------------
 router.get("/getdirtree", getDirectoryTree);
+router.put("/rename-file", RenameFile);
 
 module.exports = router;

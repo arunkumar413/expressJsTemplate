@@ -7,7 +7,7 @@ const { v4: uuidv4 } = require("uuid");
 
 module.exports.getDirectoryTree = async function (req, res) {
   const tree = dirTree(
-    "./",
+    "/home/arun/Documents/projects/my-svelte-project",
     {
       exclude: [/node_modules/, /.git/],
       attributes: ["size", "type", "extension"],
@@ -21,23 +21,10 @@ module.exports.getDirectoryTree = async function (req, res) {
   );
 
   res.json(tree);
+};
 
-  // let dir = "./";
-
-  // var dirTree = { name: "home", path: "/", children: [] };
-
-  // function traverse(node) {
-  //   var files = fs.readdirSync(node);
-  //   console.log(files);
-
-  //   files.forEach(function (item) {
-  //     let next = path.join(node, item);
-  //     dirTree.children.push(item);
-  //     if (fs.lstatSync(next).isDirectory()) {
-  //       traverse(next);
-  //     }
-  //   });
-  // }
-
-  // traverse(dir);
+module.exports.RenameFile = async function (req, res) {
+  console.log("rename");
+  console.log(req.body);
+  res.send("rename");
 };
