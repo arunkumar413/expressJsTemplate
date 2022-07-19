@@ -24,7 +24,34 @@ module.exports.getDirectoryTree = async function (req, res) {
 };
 
 module.exports.RenameFile = async function (req, res) {
-  console.log("rename");
-  console.log(req.body);
-  res.send("rename");
+  let prevPath = req.body.path;
+  let newFileName = req.body.newName;
+  let pathArr = prevPath.split("/");
+  let slice = pathArr.slice(1, pathArr.length - 1);
+  var newPath = "";
+  slice.forEach(function (item) {
+    newPath = newPath + "/" + item;
+  });
+  let pathWithFileName = newPath + "/" + newFileName;
+  fs.rename(prevPath, pathWithFileName, function (err) {
+    if (err) {
+      console.log(err);
+    } else {
+      const tree = dirTree(
+        "/home/arun/Documents/projects/my-svelte-project",
+        {
+          exclude: [/node_modules/, /.git/],
+          attributes: ["size", "type", "extension"],
+        },
+        function (item, path, stats) {
+          item.id = uuidv4();
+        },
+        function (item, path, stats) {
+          item.id = uuidv4();
+        }
+      );
+      console.log(tree);
+      res.send(tree);
+    }
+  });
 };
