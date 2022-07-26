@@ -40,7 +40,7 @@ module.exports.RenameFile = async function (req, res) {
       const tree = dirTree(
         "/home/arun/Documents/projects/my-svelte-project",
         {
-          exclude: [/node_modules/, /.git/],
+          exclude: [/node_modules/, /.git/, /.vscode/],
           attributes: ["size", "type", "extension"],
         },
         function (item, path, stats) {
@@ -51,7 +51,7 @@ module.exports.RenameFile = async function (req, res) {
         }
       );
       console.log(tree);
-      res.send(tree);
+      res.json(tree);
     }
   });
 };
