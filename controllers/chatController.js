@@ -3,7 +3,7 @@ var { neo4jUtil } = require("../db/neo4jUtil");
 
 var { knex } = require("../db/knexfile");
 const req = require("express/lib/request");
-var { knexSession } = require("../bin/www");
+// var { knexSession } = require("../bin/www");
 const { styledConsole } = require("../utils/util");
 
 var { pgConfig } = require("../db/pg");

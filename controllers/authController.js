@@ -1,10 +1,12 @@
 const { v4 } = require("uuid");
 var { neo4jUtil } = require("../db/neo4jUtil");
-const bcrypt = require("bcrypt");
+// const bcrypt = require("bcrypt");
+var bcrypt = require('bcryptjs');
+var crypto = require('crypto');
 var jwt = require("jsonwebtoken");
 var { knex } = require("../db/knexfile");
 const req = require("express/lib/request");
-var { knexSession } = require("../bin/www");
+// var { knexSession } = require("../bin/www");
 const { styledConsole } = require("../utils/util");
 
 var { pgConfig } = require("../db/pg");
@@ -12,6 +14,7 @@ const { postData, getData } = require("../db/queries");
 const res = require("express/lib/response");
 const { ResultSummary } = require("neo4j-driver");
 var session = require("express-session");
+const nodemailer = require("nodemailer");
 
 module.exports.Authenticate = async function (req, res) {
   try {
@@ -98,28 +101,36 @@ module.exports.Login = async function (req, res) {
 module.exports.Logout = async function (req, res) {
   try {
     res.send("logout");
-  } catch (err) {}
+  } catch (err) { }
 };
 
 module.exports.Register = async function (req, res) {
   try {
     let client = pgConfig.getClient();
+    // let salt = await bcrypt.genSalt(10);
+    let salt = crypto.randomBytes(16).toString('hex');
 
-    let salt = await bcrypt.genSalt(10);
-    let hash = await bcrypt.hash(req.body.password, salt);
+
+    let hash = crypto.pbkdf2Sync(req.body.password, salt, 1000, 64, `sha512`).toString(`hex`);
+
+
+
+    // let hash = await bcrypt.hash(req.body.password, salt);
     let data = req.body;
     data.password = hash;
+    styledConsole(Object.values(data), 'data')
 
     let query = {
-      text: 'INSERT INTO Users ("email", "password","firstName", "lastName","city") VALUES($1, $2,$3,$4,$5)',
-      values: Object.values(req.body),
+      text: 'INSERT INTO Users ("email", "password","firstName", "lastName","city","state","country","roles","phone") VALUES($1,$2,$3,$4,$5,$6,$7,$8,$9)',
+      values: Object.values(data),
     };
 
     let result = await client.query(query);
 
-    res.json(result.rows);
+    res.status(201).json(result.rows);
   } catch (err) {
-    res.send(err);
+    console.log(err)
+    res.status(400).json(err);
   }
 };
 
@@ -207,3 +218,42 @@ module.exports.addUserToGroup = async function (req, res) {
 
   res.json(result.records);
 };
+
+module.exports.VerifyEmail = async function (req, res) {
+
+  try {
+    console.log('######## verify email ###################')
+    let testAccount = await nodemailer.createTestAccount();
+
+    let transporter = nodemailer.createTransport({
+      host: "smtp.gmail.com",
+      port: 465,
+      secure: true, // true for 465, false for other ports
+      auth: {
+        user: '', // generated ethereal user
+        pass: '', // generated ethereal password
+      },
+    });
+
+    let plainText = `Here is your verification Email link:
+  
+  http://localhost:5000/verify-email/${v4()}
+  
+  `
+
+    // send mail with defined transport object
+    let info = await transporter.sendMail({
+      from: '"Email Verification" <express.test.email123@gmail.com>', // sender address
+      to: "arunkumar413@gmail.om", // list of receivers
+      subject: "Verify your email", // Subject line
+      text: plainText, // plain text body
+      html: "<b>Hello world?</b>", // html body
+    });
+    console.log('verify-email')
+
+    res.send('veriy email')
+  } catch (err) {
+    console.log(err)
+    req.status(400).json(err)
+  }
+}

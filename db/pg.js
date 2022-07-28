@@ -5,26 +5,34 @@ var client;
 const pool = new Pool({
   user: "postgres",
   host: "127.0.0.1",
-  database: "expressAuth",
-  password: "kumar",
-  port: 5433,
+  database: "expresstemplate",
+  password: "postgres",
+  port: 5432,
 });
-pool.query("SELECT NOW()", (err, res) => {
-  console.log(err, res);
-  pool.end();
-});
+// pool.query("SELECT NOW()", (err, res) => {
+//   console.log(err, res);
+//   pool.end();
+// });
 
 module.exports.pgConfig = {
   createClient: function () {
     client = new Client({
       user: "postgres",
       host: "127.0.0.1",
-      database: "expressAuth",
-      password: "kumar",
-      port: 5433,
+      database: "expresstemplate",
+      password: "postgres",
+      port: 5432,
     });
 
-    client.connect();
+    client.connect(function (err) {
+      if (err) {
+        console.log(err);
+      }
+      else {
+        console.log('connected to the database');
+      }
+
+    });
   },
 
   getClient: function () {

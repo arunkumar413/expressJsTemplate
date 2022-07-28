@@ -5,14 +5,14 @@ require("dotenv").config({ path: "../.env" });
 
 module.exports.knexConfig = {
   development: {
-    client: "postgresql",
+    client: "pg",
     connection: {
       host: "127.0.0.1",
 
-      port: 5433,
+      port: 5432,
       user: "postgres",
-      password: "kumar",
-      database: "expressAuth",
+      password: "postgres",
+      database: "expresstemplate",
     },
     migrations: {
       tableName: "expressAuthMigration",
@@ -53,11 +53,11 @@ module.exports.knexConfig = {
   },
 };
 
-module.exports.createKnexSession = function () {
-  knexSession = require("knex")(knexConfig[process.env.NODE_ENV]);
-  console.log(knexSesion);
-};
+// module.exports.createKnexSession = function () {
+//   knexSession = require("knex")(knexConfig[process.env.NODE_ENV]);
+//   console.log(knexSesion);
+// };
 
-module.exports.getKnexSession = function () {
-  return knexSesion;
-};
+// module.exports.getKnexSession = function () {
+//   return knexSesion;
+// };
