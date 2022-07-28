@@ -7,6 +7,7 @@ var {
   NeoTest,
   createGroup,
   addUserToGroup,
+  VerifyEmail,
 } = require("../controllers/authController");
 const {
   NewMessage,
@@ -26,12 +27,13 @@ router.get("/test", function (req, res, next) {
   console.log(req.headers);
   console.log("############# Headers ###################3");
 
-  res.render("index", { title: "Express" });
+  res.json({ title: "Express" });
 });
 // router.get("/login", Login);
 router.post("/login", Login);
 router.get("/logout", Logout);
 router.post("/register", Register);
+router.get('/verify-email', VerifyEmail)
 router.post("/newapp", NewApp);
 
 //-------------------Chat Routes--------------
