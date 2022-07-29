@@ -15,6 +15,11 @@ const res = require("express/lib/response");
 const { ResultSummary } = require("neo4j-driver");
 var session = require("express-session");
 const nodemailer = require("nodemailer");
+const fs = require('fs');
+const readline = require('readline');
+const { google } = require('googleapis');
+
+/////////////// End of require //////////////////
 
 module.exports.Authenticate = async function (req, res) {
   try {
@@ -118,7 +123,7 @@ module.exports.Register = async function (req, res) {
     // let hash = await bcrypt.hash(req.body.password, salt);
     let data = req.body;
     data.password = hash;
-    styledConsole(Object.values(data), 'data')
+    styledConsole(Object.values(data), 'req.data')
 
     let query = {
       text: 'INSERT INTO Users ("email", "password","firstName", "lastName","city","state","country","roles","phone") VALUES($1,$2,$3,$4,$5,$6,$7,$8,$9)',
@@ -126,8 +131,12 @@ module.exports.Register = async function (req, res) {
     };
 
     let result = await client.query(query);
+    let ver = await sendVerificationEmail(data)
+    if (ver === true) {
+      res.status(201).json(result.rows);
 
-    res.status(201).json(result.rows);
+    }
+
   } catch (err) {
     console.log(err)
     res.status(400).json(err);
@@ -219,41 +228,139 @@ module.exports.addUserToGroup = async function (req, res) {
   res.json(result.records);
 };
 
-module.exports.VerifyEmail = async function (req, res) {
+module.exports.SendVerificationEmail = async function (info) {
+
+  styledConsole(info, 'send verification')
 
   try {
     console.log('######## verify email ###################')
-    let testAccount = await nodemailer.createTestAccount();
+
+    // const auth = new google.auth.GoogleAuth({
+    //   keyFile: '/home/arun/projects/expressJsTemplate/googleCredentials.json',
+    //   scopes: ['https://www.googleapis.com/auth/gmail.send', 'https://www.googleapis.com/auth/gmail.compose', 'https://www.googleapis.com/auth/gmail.metadata', 'https://www.googleapis.com/auth/gmail.modify'],
+    // });
+
+    // const authClient = await auth.getClient();
+    // google.options({ auth: authClient });
+
+    // const apis = google.getSupportedAPIs();
+    // const gmail = google.gmail('v1');
+
+    // let raw = makeBody('arunkumar413@gmail.com', 'express.test.email123@gmail.com', 'verify your email', 'Here is your verification link');
+
+    // const res = await gmail.users.messages.send({
+    //   auth: auth,
+    //   userId: 'me',
+    //   requestBody: {
+    //     raw: raw,
+    //   }
+    // })
+
+    // styledConsole(await res.json(), 'email response')
+
+
 
     let transporter = nodemailer.createTransport({
-      host: "smtp.gmail.com",
-      port: 465,
-      secure: true, // true for 465, false for other ports
+      host: process.env.EMAIL_VERIFICATION_HOST,
+      port: process.env.EMAIL_VERIFICATION_PORT,
+      secure: true,
       auth: {
-        user: '', // generated ethereal user
-        pass: '', // generated ethereal password
+        user: process.env.EMAIL_VERIFICATION_USER_NAME,
+        pass: process.env.EMAIL_VERIFICATION_PASSWORD,
       },
     });
 
-    let plainText = `Here is your verification Email link:
-  
-  http://localhost:5000/verify-email/${v4()}
-  
-  `
+    let emailBodyText = `
+    Hi There,
+
+    Thanks for registering an account with us:
+
+    Please verify your account by clicking the link below:
+    
+    http://localhost:5000/${v4()}
+    
+    Regards,
+    Express App Team
+
+    `
 
     // send mail with defined transport object
     let info = await transporter.sendMail({
-      from: '"Email Verification" <express.test.email123@gmail.com>', // sender address
-      to: "arunkumar413@gmail.om", // list of receivers
-      subject: "Verify your email", // Subject line
-      text: plainText, // plain text body
-      html: "<b>Hello world?</b>", // html body
+      from: '"noreply" <arunkumar413@zohomail.in>',
+      to: "arunkumar413@gmail.com",
+      subject: "verify your email",
+      text: emailBodyText,
+      // html: "<b>Hello world?</b>", // html body
     });
-    console.log('verify-email')
 
-    res.send('veriy email')
+
+
+
+
+
+    res.send(info)
   } catch (err) {
     console.log(err)
-    req.status(400).json(err)
+    res.status(400).json(err)
   }
+}
+
+function makeBody(to, from, subject, message) {
+  var str = ["Content-Type: text/plain; charset=\"UTF-8\"\n",
+    "MIME-Version: 1.0\n",
+    "Content-Transfer-Encoding: 7bit\n",
+    "to: ", to, "\n",
+    "from: ", from, "\n",
+    "subject: ", subject, "\n\n",
+    message
+  ].join('');
+
+  var encodedMail = new Buffer(str).toString("base64").replace(/\+/g, '-').replace(/\//g, '_');
+  return encodedMail;
+}
+
+
+async function sendVerificationEmail(data) {
+
+  try {
+    styledConsole(data, 'verification')
+
+
+    let transporter = nodemailer.createTransport({
+      host: process.env.EMAIL_VERIFICATION_HOST,
+      port: process.env.EMAIL_VERIFICATION_PORT,
+      secure: true,
+      auth: {
+        user: process.env.EMAIL_VERIFICATION_USER_NAME,
+        pass: process.env.EMAIL_VERIFICATION_PASSWORD,
+      },
+    });
+
+    let emailBodyText = `Hi ${data.firstName},
+    Thanks for registering an account with us:
+
+    Please verify your account by clicking the link below:
+  
+    http://localhost:5000/${v4()}
+  
+    Regards,
+    Express App Team
+
+  `
+    // send mail with defined transport object
+    let info = await transporter.sendMail({
+      from: '"noreply" <arunkumar413@zohomail.in>',
+      to: data.email,
+      subject: "verify your email",
+      text: emailBodyText,
+      // html: "<b>Hello world?</b>", // html body
+    });
+
+    return true
+
+  } catch (err) {
+    console.log(err)
+    return false
+  }
+
 }

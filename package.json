@@ -21,6 +21,7 @@
     "express-session": "^1.17.2",
     "file": "^0.2.2",
     "glob": "^8.0.3",
+    "googleapis": "^105.0.0",
     "help": "^3.0.2",
     "http-errors": "~1.6.3",
     "jsonwebtoken": "^8.5.1",

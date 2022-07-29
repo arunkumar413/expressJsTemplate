@@ -8,6 +8,7 @@ var {
   createGroup,
   addUserToGroup,
   VerifyEmail,
+  SendVerificationEmail,
 } = require("../controllers/authController");
 const {
   NewMessage,
@@ -33,7 +34,7 @@ router.get("/test", function (req, res, next) {
 router.post("/login", Login);
 router.get("/logout", Logout);
 router.post("/register", Register);
-router.get('/verify-email', VerifyEmail)
+router.get('/verify-email', SendVerificationEmail)
 router.post("/newapp", NewApp);
 
 //-------------------Chat Routes--------------
