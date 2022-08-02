@@ -1,4 +1,5 @@
 const fs = require("fs");
+var fsPromises = fs.promises;
 const dirTree = require("directory-tree");
 const dree = require("dree");
 const path = require("path");
@@ -31,49 +32,76 @@ module.exports.getDirectoryTree = async function (req, res) {
 };
 
 module.exports.RenameFile = async function (req, res) {
-  let prevPath = req.body.path;
-  let newFileName = req.body.newName;
-  let pathArr = prevPath.split("/");
-  let slice = pathArr.slice(1, pathArr.length - 1);
-  var newPath = "";
-  slice.forEach(function (item) {
-    newPath = newPath + "/" + item;
-  });
-  let pathWithFileName = newPath + "/" + newFileName;
-  fs.rename(prevPath, pathWithFileName, function (err) {
-    if (err) {
-      console.log(err);
-    } else {
-      const tree = dirTree(
-        "/home/arun/Documents/projects/my-svelte-project",
-        {
-          exclude: [/node_modules/, /.git/, /.vscode/],
-          attributes: ["size", "type", "extension"],
-        },
-        function (item, path, stats) {
-          item.id = uuidv4();
-        },
-        function (item, path, stats) {
-          item.id = uuidv4();
-        }
-      );
-      console.log(tree);
-      res.json(tree);
-    }
-  });
+  console.log("############## rename file ##################");
+  try {
+    let prevPath = req.body.path;
+    let newFileName = req.body.newName;
+    let pathArr = prevPath.split("/");
+    let slice = pathArr.slice(1, pathArr.length - 1);
+    var newPath = "";
+    slice.forEach(function (item) {
+      newPath = newPath + "/" + item;
+    });
+    let pathWithFileName = newPath + "/" + newFileName;
+
+    let result = await fsPromises.rename(prevPath, pathWithFileName);
+    let tree = await getTree();
+    res.status(200).json(tree);
+  } catch (err) {
+    res.status(400).json(err);
+  }
 };
 
 module.exports.AddNewFile = async function (req, res) {
-  console.log("################## add new file ##################");
-  console.log(req.body);
-  console.log("################## add new file ##################");
-
-  fs.open(req.body.path + "/" + req.body.newName, "w", function (err, file) {
-    if (err) throw err;
-    let tree = getTree();
-    console.log(tree);
+  try {
+    let result = await fsPromises.open(
+      req.body.path + "/" + req.body.newName,
+      "w"
+    );
+    console.log(result);
+    let tree = await getTree();
     res.status(201).json(tree);
-  });
+  } catch (err) {
+    res.status(400).json(err);
+  }
+};
+
+module.exports.AddNewDirectory = async function (req, res) {
+  try {
+    let result = fsPromises.mkdir(req.body.path + "/" + req.body.newName);
+    let tree = await getTree();
+    res.status(201).json(tree);
+  } catch (err) {
+    req.status(400).json(err);
+  }
+};
+
+module.exports.EditDirName = async function (req, res) {
+  try {
+    var pathArr = req.body.path.split("/");
+    pathArr.pop();
+    let newPath = pathArr.join("/");
+    let result = fsPromises.rename(
+      req.body.path,
+      newPath + "/" + req.body.newName
+    );
+    let tree = await getTree();
+    res.status(201).json(tree);
+  } catch (err) {
+    req.status(400).json(err);
+  }
+};
+
+module.exports.GetFileContent = async function (req, res) {
+  console.log("##########  GET file content ###############");
+  console.log(req.query);
+  try {
+    const data = fs.readFileSync(req.query.path, "utf8");
+    console.log(data);
+    res.status(200).json(data);
+  } catch (err) {
+    res.status(400).json(err);
+  }
 };
 
 async function getTree() {

@@ -20,6 +20,9 @@ const {
   getDirectoryTree,
   RenameFile,
   AddNewFile,
+  AddNewDirectory,
+  EditDirName,
+  GetFileContent,
 } = require("../controllers/fileSystemController");
 var router = express.Router();
 
@@ -50,5 +53,8 @@ router.post("/new-message", NewMessage);
 router.get("/getdirtree", getDirectoryTree);
 router.put("/rename-file", RenameFile);
 router.post("/add-new-file", AddNewFile);
+router.post("/add-new-dir", AddNewDirectory);
+router.put("/edit-dir-name", EditDirName);
+router.get("/get-file-content", GetFileContent);
 
 module.exports = router;
