@@ -19,6 +19,7 @@ const {
   getFileSystem,
   getDirectoryTree,
   RenameFile,
+  AddNewFile,
 } = require("../controllers/fileSystemController");
 var router = express.Router();
 
@@ -34,7 +35,7 @@ router.get("/test", function (req, res, next) {
 router.post("/login", Login);
 router.get("/logout", Logout);
 router.post("/register", Register);
-router.get('/verify-email', SendVerificationEmail)
+router.get("/verify-email", SendVerificationEmail);
 router.post("/newapp", NewApp);
 
 //-------------------Chat Routes--------------
@@ -48,5 +49,6 @@ router.post("/new-message", NewMessage);
 //--------------------file system routes------------------------
 router.get("/getdirtree", getDirectoryTree);
 router.put("/rename-file", RenameFile);
+router.post("/add-new-file", AddNewFile);
 
 module.exports = router;
