@@ -23,6 +23,7 @@ const {
   AddNewDirectory,
   EditDirName,
   GetFileContent,
+  SaveFile,
 } = require("../controllers/fileSystemController");
 var router = express.Router();
 
@@ -56,5 +57,6 @@ router.post("/add-new-file", AddNewFile);
 router.post("/add-new-dir", AddNewDirectory);
 router.put("/edit-dir-name", EditDirName);
 router.get("/get-file-content", GetFileContent);
+router.put("/save-file", SaveFile);
 
 module.exports = router;

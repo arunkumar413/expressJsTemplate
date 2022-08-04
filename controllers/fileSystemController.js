@@ -104,6 +104,19 @@ module.exports.GetFileContent = async function (req, res) {
   }
 };
 
+module.exports.SaveFile = async function (req, res) {
+  console.log("################## Save file #############");
+  console.log(req.body);
+  try {
+    fs.writeFile(req.body.node.path, req.body.fileContent, function (err) {
+      if (err) throw err;
+      console.log("Replaced!");
+    });
+  } catch (err) {
+    res.status(400).json(err);
+  }
+};
+
 async function getTree() {
   try {
     let tree = dirTree(
