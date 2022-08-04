@@ -111,6 +111,8 @@ module.exports.SaveFile = async function (req, res) {
     fs.writeFile(req.body.node.path, req.body.fileContent, function (err) {
       if (err) throw err;
       console.log("Replaced!");
+      const data = fs.readFileSync(req.body.node.path, "utf8");
+      res.status(200).json(data);
     });
   } catch (err) {
     res.status(400).json(err);
