@@ -1,8 +1,8 @@
 const { v4 } = require("uuid");
 var { neo4jUtil } = require("../db/neo4jUtil");
 // const bcrypt = require("bcrypt");
-var bcrypt = require('bcryptjs');
-var crypto = require('crypto');
+var bcrypt = require("bcryptjs");
+var crypto = require("crypto");
 var jwt = require("jsonwebtoken");
 var { knex } = require("../db/knexfile");
 const req = require("express/lib/request");
@@ -15,9 +15,9 @@ const res = require("express/lib/response");
 const { ResultSummary } = require("neo4j-driver");
 var session = require("express-session");
 const nodemailer = require("nodemailer");
-const fs = require('fs');
-const readline = require('readline');
-const { google } = require('googleapis');
+const fs = require("fs");
+const readline = require("readline");
+const { google } = require("googleapis");
 
 /////////////// End of require //////////////////
 
@@ -106,24 +106,23 @@ module.exports.Login = async function (req, res) {
 module.exports.Logout = async function (req, res) {
   try {
     res.send("logout");
-  } catch (err) { }
+  } catch (err) {}
 };
 
 module.exports.Register = async function (req, res) {
   try {
     let client = pgConfig.getClient();
     // let salt = await bcrypt.genSalt(10);
-    let salt = crypto.randomBytes(16).toString('hex');
+    let salt = crypto.randomBytes(16).toString("hex");
 
-
-    let hash = crypto.pbkdf2Sync(req.body.password, salt, 1000, 64, `sha512`).toString(`hex`);
-
-
+    let hash = crypto
+      .pbkdf2Sync(req.body.password, salt, 1000, 64, `sha512`)
+      .toString(`hex`);
 
     // let hash = await bcrypt.hash(req.body.password, salt);
     let data = req.body;
     data.password = hash;
-    styledConsole(Object.values(data), 'req.data')
+    styledConsole(Object.values(data), "req.data");
 
     let query = {
       text: 'INSERT INTO Users ("email", "password","firstName", "lastName","city","state","country","roles","phone") VALUES($1,$2,$3,$4,$5,$6,$7,$8,$9)',
@@ -131,14 +130,12 @@ module.exports.Register = async function (req, res) {
     };
 
     let result = await client.query(query);
-    let ver = await sendVerificationEmail(data)
+    let ver = await sendVerificationEmail(data);
     if (ver === true) {
       res.status(201).json(result.rows);
-
     }
-
   } catch (err) {
-    console.log(err)
+    console.log(err);
     res.status(400).json(err);
   }
 };
@@ -229,11 +226,10 @@ module.exports.addUserToGroup = async function (req, res) {
 };
 
 module.exports.SendVerificationEmail = async function (info) {
-
-  styledConsole(info, 'send verification')
+  styledConsole(info, "send verification");
 
   try {
-    console.log('######## verify email ###################')
+    console.log("######## verify email ###################");
 
     // const auth = new google.auth.GoogleAuth({
     //   keyFile: '/home/arun/projects/expressJsTemplate/googleCredentials.json',
@@ -258,8 +254,6 @@ module.exports.SendVerificationEmail = async function (info) {
 
     // styledConsole(await res.json(), 'email response')
 
-
-
     let transporter = nodemailer.createTransport({
       host: process.env.EMAIL_VERIFICATION_HOST,
       port: process.env.EMAIL_VERIFICATION_PORT,
@@ -282,7 +276,7 @@ module.exports.SendVerificationEmail = async function (info) {
     Regards,
     Express App Team
 
-    `
+    `;
 
     // send mail with defined transport object
     let info = await transporter.sendMail({
@@ -293,39 +287,42 @@ module.exports.SendVerificationEmail = async function (info) {
       // html: "<b>Hello world?</b>", // html body
     });
 
-
-
-
-
-
-    res.send(info)
+    res.send(info);
   } catch (err) {
-    console.log(err)
-    res.status(400).json(err)
+    console.log(err);
+    res.status(400).json(err);
   }
-}
+};
 
 function makeBody(to, from, subject, message) {
-  var str = ["Content-Type: text/plain; charset=\"UTF-8\"\n",
+  var str = [
+    'Content-Type: text/plain; charset="UTF-8"\n',
     "MIME-Version: 1.0\n",
     "Content-Transfer-Encoding: 7bit\n",
-    "to: ", to, "\n",
-    "from: ", from, "\n",
-    "subject: ", subject, "\n\n",
-    message
-  ].join('');
+    "to: ",
+    to,
+    "\n",
+    "from: ",
+    from,
+    "\n",
+    "subject: ",
+    subject,
+    "\n\n",
+    message,
+  ].join("");
 
-  var encodedMail = new Buffer(str).toString("base64").replace(/\+/g, '-').replace(/\//g, '_');
+  var encodedMail = new Buffer(str)
+    .toString("base64")
+    .replace(/\+/g, "-")
+    .replace(/\//g, "_");
   return encodedMail;
 }
 
-
 async function sendVerificationEmail(data) {
-
   try {
-    styledConsole(data, 'verification')
+    styledConsole(data, "verification");
 
-
+    let verificationId = v4();
     let transporter = nodemailer.createTransport({
       host: process.env.EMAIL_VERIFICATION_HOST,
       port: process.env.EMAIL_VERIFICATION_PORT,
@@ -341,12 +338,12 @@ async function sendVerificationEmail(data) {
 
     Please verify your account by clicking the link below:
   
-    http://localhost:5000/${v4()}
+    http://localhost:5000/verification/${verificationId}
   
     Regards,
     Express App Team
 
-  `
+  `;
     // send mail with defined transport object
     let info = await transporter.sendMail({
       from: '"noreply" <arunkumar413@zohomail.in>',
@@ -356,11 +353,18 @@ async function sendVerificationEmail(data) {
       // html: "<b>Hello world?</b>", // html body
     });
 
-    return true
+    let client = pgConfig.getClient();
 
+    let query = {
+      text: "UPDATE Users SET verification_code=$1 WHERE email=$2",
+      values: [verificationId, data.email],
+    };
+
+    let result = await client.query(query);
+
+    return true;
   } catch (err) {
-    console.log(err)
-    return false
+    console.log(err);
+    return false;
   }
-
 }
