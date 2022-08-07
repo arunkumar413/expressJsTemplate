@@ -11,7 +11,7 @@ module.exports.getDirectoryTree = async function (req, res) {
   console.log("##################### tree ###################");
   try {
     const tree = dirTree(
-      "/home/arun/projects/test-project",
+      "/home/arun/projects/openAPI-document-generator",
       {
         exclude: [/node_modules/, /.git/],
         attributes: ["size", "type", "extension"],
@@ -122,7 +122,7 @@ module.exports.SaveFile = async function (req, res) {
 async function getTree() {
   try {
     let tree = dirTree(
-      "/home/arun/projects/test-project",
+      "/home/arun/projects/openAPI-document-generator",
       {
         exclude: [/node_modules/, /.git/],
         attributes: ["size", "type", "extension"],

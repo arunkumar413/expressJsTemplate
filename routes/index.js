@@ -25,6 +25,7 @@ const {
   GetFileContent,
   SaveFile,
 } = require("../controllers/fileSystemController");
+const { GetCommitHistory } = require("../controllers/gitController");
 var router = express.Router();
 
 /* GET home page. */
@@ -58,5 +59,8 @@ router.post("/add-new-dir", AddNewDirectory);
 router.put("/edit-dir-name", EditDirName);
 router.get("/get-file-content", GetFileContent);
 router.put("/save-file", SaveFile);
+
+//----------------Git routes-----------
+router.get("/git/commit-history", GetCommitHistory);
 
 module.exports = router;
