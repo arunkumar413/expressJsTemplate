@@ -15,4 +15,5 @@ module.exports.GetCommitHistory = async function (req, res) {
   });
   console.log(commits);
   res.status(200).json(commits);
+  
 };
