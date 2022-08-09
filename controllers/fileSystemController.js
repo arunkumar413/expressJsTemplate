@@ -8,10 +8,10 @@ const { v4: uuidv4 } = require("uuid");
 const { styledConsole } = require("../utils/util");
 
 module.exports.getDirectoryTree = async function (req, res) {
-  console.log("##################### tree ###################");
   try {
+    debugger;
     const tree = dirTree(
-      "/home/arun/projects/openAPI-document-generator",
+      req.query.project,
       {
         exclude: [/node_modules/, /.git/],
         attributes: ["size", "type", "extension"],
@@ -23,16 +23,15 @@ module.exports.getDirectoryTree = async function (req, res) {
         item.id = uuidv4();
       }
     );
-    styledConsole(tree, "tree out put");
+    // styledConsole(tree, "tree out put");
 
-    res.json(tree);
+    res.status(200).json(tree);
   } catch (err) {
     res.status(400).send(err);
   }
 };
 
 module.exports.RenameFile = async function (req, res) {
-  console.log("############## rename file ##################");
   try {
     let prevPath = req.body.path;
     let newFileName = req.body.newName;
@@ -58,7 +57,6 @@ module.exports.AddNewFile = async function (req, res) {
       req.body.path + "/" + req.body.newName,
       "w"
     );
-    console.log(result);
     let tree = await getTree();
     res.status(201).json(tree);
   } catch (err) {
@@ -93,11 +91,9 @@ module.exports.EditDirName = async function (req, res) {
 };
 
 module.exports.GetFileContent = async function (req, res) {
-  console.log("##########  GET file content ###############");
-  console.log(req.query);
   try {
     const data = fs.readFileSync(req.query.path, "utf8");
-    console.log(data);
+
     res.status(200).json(data);
   } catch (err) {
     res.status(400).json(err);
@@ -105,12 +101,9 @@ module.exports.GetFileContent = async function (req, res) {
 };
 
 module.exports.SaveFile = async function (req, res) {
-  console.log("################## Save file #############");
-  console.log(req.body);
   try {
     fs.writeFile(req.body.node.path, req.body.fileContent, function (err) {
       if (err) throw err;
-      console.log("Replaced!");
       const data = fs.readFileSync(req.body.node.path, "utf8");
       res.status(200).json(data);
     });

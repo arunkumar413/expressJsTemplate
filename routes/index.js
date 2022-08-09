@@ -52,7 +52,7 @@ router.post("/add-user-to-group", addUserToGroup);
 router.post("/new-message", NewMessage);
 
 //--------------------file system routes------------------------
-router.get("/getdirtree", getDirectoryTree);
+router.get("/getdirtree?", getDirectoryTree);
 router.put("/rename-file", RenameFile);
 router.post("/add-new-file", AddNewFile);
 router.post("/add-new-dir", AddNewDirectory);
