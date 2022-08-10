@@ -7,6 +7,8 @@ module.exports.GetCommitHistory = async function (req, res) {
   console.log("############## Commit History ###############");
   // pathToRepo = "/home/arun/projects/openAPI-document-generator";
 
+  console.log(req.query);
+
   try {
     let commits = await git.log({
       fs,
@@ -16,6 +18,7 @@ module.exports.GetCommitHistory = async function (req, res) {
     });
     res.status(200).json(commits);
   } catch (err) {
+    console.log(err);
     res.status(400).json(err);
   }
 };

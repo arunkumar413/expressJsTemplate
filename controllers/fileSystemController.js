@@ -101,10 +101,11 @@ module.exports.GetFileContent = async function (req, res) {
 };
 
 module.exports.SaveFile = async function (req, res) {
+  styledConsole(req.body, "saveFile");
   try {
     fs.writeFile(req.body.node.path, req.body.fileContent, function (err) {
       if (err) throw err;
-      const data = fs.readFileSync(req.body.node.path, "utf8");
+      const data = fs.readFileSync(req.body.node.path, "utf8"); 
       res.status(200).json(data);
     });
   } catch (err) {
