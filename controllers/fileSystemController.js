@@ -6,6 +6,7 @@ const path = require("path");
 var glob = require("glob");
 const { v4: uuidv4 } = require("uuid");
 const { styledConsole } = require("../utils/util");
+const prettier = require("prettier");
 
 module.exports.getDirectoryTree = async function (req, res) {
   try {
@@ -103,9 +104,18 @@ module.exports.GetFileContent = async function (req, res) {
 module.exports.SaveFile = async function (req, res) {
   styledConsole(req.body, "saveFile");
   try {
-    fs.writeFile(req.body.node.path, req.body.fileContent, function (err) {
+    let forMattedCode = prettier.format(req.body.fileContent, {
+      semi: false,
+      parser: "babel",
+    });
+
+    styledConsole(req.body.fileContent, "file-content");
+    styledConsole(forMattedCode, "formatted- code");
+
+    fs.writeFile(req.body.node.path, forMattedCode, function (err) {
       if (err) throw err;
-      const data = fs.readFileSync(req.body.node.path, "utf8"); 
+      const data = fs.readFileSync(req.body.node.path, "utf8");
+      styledConsole(data, "file-data");
       res.status(200).json(data);
     });
   } catch (err) {
